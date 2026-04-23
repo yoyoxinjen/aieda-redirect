@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>跳轉中...</title>
+</head>
+<body>
+    <p>正在導向 AIEDA 系統...</p>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const caseId = urlParams.get('ids_case_id');
+        if (caseId) {
+            const targetUrl = `aieda://funcId=20221004-3e26b4f3-de7b-4e47-9415-f4de71bc945b&isSystem=true&fab=FAB12&idsCaseId=${caseId}`;
+            window.location.href = targetUrl;
+    } else {
+            document.body.innerHTML = "<h1>錯誤：未偵測到 ids_case_id</h1>";
+        }
+    </script>
+</body>
+</html>
