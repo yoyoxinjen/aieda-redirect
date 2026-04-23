@@ -23,20 +23,26 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const caseId = urlParams.get('ids_case_id');
+        const caseIdDisplayElement = document.getElementById('caseIdDisplay'); // 獲取顯示元素
         if (caseId) {
+            // 顯示 ids_case_id
+            caseIdDisplayElement.textContent = `案件 ID: ${caseId}`;
+
             const targetUrl = `aieda://funcId=20221004-3e26b4f3-de7b-4e47-9415-f4de71bc945b&isSystem=true&fab=FAB12&idsCaseId=${caseId}`;
          // 顯示手動按鈕以防萬一
         const btn = document.getElementById('manualLink');
         btn.href = targetUrl;
         btn.style.display = 'inline-block';
             
-        // 嘗試自動跳轉
+        // 嘗試自動跳轉（或在新分頁開啟，根據您的需求選擇）
             setTimeout(() => {
-                window.location.href = targetUrl;
+                // 建議仍然使用 window.location.href 嘗試自動跳轉
+                // 如果您堅持要用新分頁開啟，請使用 window.open(targetUrl, '_blank');
+                window.location.href = targetUrl; 
             }, 10);
         } else {
             document.querySelector('.container').innerHTML = "<h1>錯誤</h1><p>網址缺少 ids_case_id 參數</p>";
-        }
+        }      
     </script>
 </body>
 </html>
