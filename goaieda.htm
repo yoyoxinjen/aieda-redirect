@@ -3,17 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>跳轉中...</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f4f7f9; }
+                .container { text-align: center; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                .btn { display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #0078d4; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; }
+                .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 2s linear infinite; margin: 10px auto; }
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
-    <p>正在導向 AIEDA 系統...</p>
+    <p>正在導向 AIEDA 系統...</p>    <div class="container">
+        <h2>正在開啟 AIEDA 系統...</h2>
+        <div class="loader"></div>
+        <p>如果瀏覽器彈出詢問視窗，請點擊「開啟」</p>
+        <!-- 備用按鈕 -->
+        <a id="manualLink" class="btn" style="display:none;">手動開啟 AIEDA</a>
+    </div>
+    
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const caseId = urlParams.get('ids_case_id');
         if (caseId) {
             const targetUrl = `aieda://funcId=20221004-3e26b4f3-de7b-4e47-9415-f4de71bc945b&isSystem=true&fab=FAB12&idsCaseId=${caseId}`;
-            window.location.href = targetUrl;
-    } else {
-            document.body.innerHTML = "<h1>錯誤：未偵測到 ids_case_id</h1>";
+         // 顯示手動按鈕以防萬一
+        const btn = document.getElementById('manualLink');
+        btn.href = targetUrl;
+        btn.style.display = 'inline-block';
+            
+        // 嘗試自動跳轉
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 10);
+        } else {
+            document.querySelector('.container').innerHTML = "<h1>錯誤</h1><p>網址缺少 ids_case_id 參數</p>";
         }
     </script>
 </body>
