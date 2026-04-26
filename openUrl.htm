@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <title>AIEDA 跳轉頁面</title>
     <style>
-        body { font-family: monospace; line-height: 1.6; padding: 20px; }
-        .info { margin-bottom: 20px; }
-        .btn { padding: 10px 20px; cursor: pointer; }
+        body { font-family: monospace; line-height: 1.6; padding: 20px; background-color: #fafafa; }
+        .info { margin-bottom: 20px; border-left: 5px solid #0078d4; padding-left: 15px; }
+        .btn { padding: 10px 20px; cursor: pointer; background-color: #0078d4; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        .btn:hover { background-color: #005a9e; }
+        #timer { color: #d93025; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -14,7 +16,9 @@
     <div class="info">
         <div>讀取到的 ids_case_id: <span id="caseId">讀取中...</span></div>
         <div>預計開啟網址: <span id="fullUrl">計算中...</span></div>
-        <div style="color: red; margin-top: 10px;">本視窗將於 10 秒後自動嘗試關閉。</div>
+        <div style="margin-top: 10px;">
+            此分頁將於 <span id="timer">10</span> 秒後自動關閉。
+        </div>
     </div>
 
     <button id="manualBtn" class="btn">手動開啟連結</button>
@@ -31,13 +35,11 @@
             document.getElementById('caseId').textContent = idsCaseId;
             document.getElementById('fullUrl').textContent = new_open_Url;
             
-            // 綁定手動按鈕
             document.getElementById('manualBtn').onclick = function() {
                 window.open(new_open_Url, '_blank');
             };
 
-            // 3. 自動執行開啟新分頁
-            // 注意：部分瀏覽器會攔截非使用者觸發的 window.open，若攔截請改用按鈕
+            // 3. 自動執行開啟新分頁 (0.5秒後執行)
             setTimeout(() => {
                 window.open(new_open_Url, '_blank');
             }, 500);
@@ -47,12 +49,20 @@
             document.getElementById('fullUrl').textContent = "無";
         }
 
-        // 4. 一分鐘後自動關閉 (10,000 毫秒)
+        // 4. 倒數計時顯示 (單純為了視覺效果)
+        let timeLeft = 10;
+        const timerElement = document.getElementById('timer');
+        const countdown = setInterval(() => {
+            timeLeft--;
+            if (timerElement) timerElement.textContent = timeLeft;
+            if (timeLeft <= 0) clearInterval(countdown);
+        }, 1000);
+
+        // 5. 10 秒後自動關閉 (10,000 毫秒)
         setTimeout(() => {
-            console.log("正在嘗試關閉視窗...");
             window.close();
-            // 如果 window.close() 因為瀏覽器安全性限制失效，提供文字提示
-            document.body.innerHTML = "<h1>作業結束</h1><p>已達一分鐘，請手動關閉此分頁。</p>";
+            // 備援方案：如果瀏覽器攔截了 window.close()
+            document.body.innerHTML = "<h1>作業結束</h1><p>已達 10 秒，系統嘗試關閉視窗失敗，請手動關閉此分頁。</p>";
         }, 10000);
     </script>
 
