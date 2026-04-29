@@ -2,66 +2,64 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>AIEDA 靜默跳轉</title>
+    <title>AIEDA 跳轉 (HREF 版)</title>
+    <style>
+        body { font-family: monospace; line-height: 1.6; padding: 20px; background-color: #f9f9f9; }
+        .card { background: white; border: 1px solid #ddd; padding: 15px; border-radius: 4px; }
+        .url-text { color: #666; font-size: 12px; word-break: break-all; }
+        .btn { margin-top: 15px; padding: 8px 16px; cursor: pointer; background: #444; color: #fff; border: none; }
+        #timer { color: red; font-weight: bold; }
+    </style>
 </head>
-<body style="font-family: monospace; padding: 20px;">
+<body>
 
-    <h3>AIEDA 系統靜默啟動中</h3>
-    <hr>
-    <div>案件 ID: <b id="caseIdDisplay">讀取中...</b></div>
-    <div>組合網址: <small id="urlDisplay" style="color: #666;"></small></div>
-    <div id="status" style="margin-top: 10px; color: blue;">正在透過隱藏視窗發送請求...</div>
-    <hr>
-    <p>此網頁將於 <span id="timer">10</span> 秒後自動關閉。</p>
-    
-    <button onclick="triggerIframe()">如果沒反應，請點擊此處手動觸發</button>
+    <div class="card">
+        <h3>AIEDA 系統導向中</h3>
+        <div>案件 ID：<b id="caseId">讀取中...</b></div>
+        <div class="url-text">目標網址：<span id="fullUrl">---</span></div>
+        <hr>
+        <p>系統將於 <span id="timer">10</span> 秒後自動嘗試關閉此頁面。</p>
+        <button class="btn" onclick="triggerRedirect()">手動強制跳轉</button>
+    </div>
 
     <script>
+        // 1. 基本設定
         const baseUrl = "aieda://funcId=20221004-3e26b4f3-de7b-4e47-9415-f4de71bc945b&isSystem=true&fab=FAB12&idsCaseId=";
         const urlParams = new URLSearchParams(window.location.search);
         const idsCaseId = urlParams.get('ids_case_id');
         const new_open_Url = idsCaseId ? (baseUrl + idsCaseId) : null;
 
-        function triggerIframe() {
-            if (!new_open_Url) return;
-
-            // 建立一個隱藏的 iframe
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = new_open_Url;
-            
-            // 將 iframe 加入頁面以觸發請求
-            document.body.appendChild(iframe);
-            
-            document.getElementById('status').textContent = "已發送開啟請求，請留意系統彈窗。";
-            
-            // 觸發後 1 秒移除 iframe 清理空間
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-            }, 1000);
+        // 執行跳轉的函式
+        function triggerRedirect() {
+            if (new_open_Url) {
+                // 直接修改當前視窗網址，觸發自訂協議
+                window.location.href = new_open_Url;
+            }
         }
 
+        // 2. 顯示資訊並自動執行
         if (idsCaseId) {
-            document.getElementById('caseIdDisplay').textContent = idsCaseId;
-            document.getElementById('urlDisplay').textContent = new_open_Url;
+            document.getElementById('caseId').textContent = idsCaseId;
+            document.getElementById('fullUrl').textContent = new_open_Url;
             
-            // 0.5 秒後自動執行靜默觸發
-            setTimeout(triggerIframe, 500);
+            // 0.5 秒後自動觸發跳轉
+            setTimeout(triggerRedirect, 500);
         } else {
-            document.getElementById('status').textContent = "錯誤：未找到 ids_case_id 參數";
+            document.getElementById('caseId').textContent = "未偵測到 ids_case_id 參數";
         }
 
-        // 倒數計時與自動關閉
+        // 3. 10 秒倒數計時與關閉
         let timeLeft = 10;
-        const timerText = document.getElementById('timer');
+        const timerElement = document.getElementById('timer');
+        
         const countdown = setInterval(() => {
             timeLeft--;
-            timerText.textContent = timeLeft;
+            timerElement.textContent = timeLeft;
             if (timeLeft <= 0) {
                 clearInterval(countdown);
                 window.close();
                 // 備援提示
-                document.body.innerHTML = "<h3>作業結束</h3><p>請手動關閉此頁面。</p>";
+                document.body.innerHTML = "<h3>跳轉任務已發送</h3><p>若視窗未自動關閉，請手動關閉此分頁。</p>";
             }
         }, 1000);
     </script>
