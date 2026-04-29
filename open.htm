@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>AIEDA 靜默跳轉</title>
+</head>
+<body style="font-family: monospace; padding: 20px;">
+
+    <h3>AIEDA 系統靜默啟動中</h3>
+    <hr>
+    <div>案件 ID: <b id="caseIdDisplay">讀取中...</b></div>
+    <div>組合網址: <small id="urlDisplay" style="color: #666;"></small></div>
+    <div id="status" style="margin-top: 10px; color: blue;">正在透過隱藏視窗發送請求...</div>
+    <hr>
+    <p>此網頁將於 <span id="timer">10</span> 秒後自動關閉。</p>
+    
+    <button onclick="triggerIframe()">如果沒反應，請點擊此處手動觸發</button>
+
+    <script>
+        const baseUrl = "aieda://funcId=20221004-3e26b4f3-de7b-4e47-9415-f4de71bc945b&isSystem=true&fab=FAB12&idsCaseId=";
+        const urlParams = new URLSearchParams(window.location.search);
+        const idsCaseId = urlParams.get('ids_case_id');
+        const new_open_Url = idsCaseId ? (baseUrl + idsCaseId) : null;
+
+        function triggerIframe() {
+            if (!new_open_Url) return;
+
+            // 建立一個隱藏的 iframe
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = new_open_Url;
+            
+            // 將 iframe 加入頁面以觸發請求
+            document.body.appendChild(iframe);
+            
+            document.getElementById('status').textContent = "已發送開啟請求，請留意系統彈窗。";
+            
+            // 觸發後 1 秒移除 iframe 清理空間
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+        }
+
+        if (idsCaseId) {
+            document.getElementById('caseIdDisplay').textContent = idsCaseId;
+            document.getElementById('urlDisplay').textContent = new_open_Url;
+            
+            // 0.5 秒後自動執行靜默觸發
+            setTimeout(triggerIframe, 500);
+        } else {
+            document.getElementById('status').textContent = "錯誤：未找到 ids_case_id 參數";
+        }
+
+        // 倒數計時與自動關閉
+        let timeLeft = 10;
+        const timerText = document.getElementById('timer');
+        const countdown = setInterval(() => {
+            timeLeft--;
+            timerText.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                window.close();
+                // 備援提示
+                document.body.innerHTML = "<h3>作業結束</h3><p>請手動關閉此頁面。</p>";
+            }
+        }, 1000);
+    </script>
+
+</body>
+</html>
